@@ -1,0 +1,7 @@
+<h3>Hello {{ user.first_name }}. You can add a new post, tell us about something</h3>
+<form action="{% url 'blog:add_post' %}" method="post" enctype="multipart/form-data">
+    {{ post_form.as_p }}
+    {{ file_form.as_p }}
+    {% csrf_token %}
+    <p><input type="submit" value="Add post"></p>
+</form>
