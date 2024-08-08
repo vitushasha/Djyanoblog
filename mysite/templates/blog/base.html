@@ -25,6 +25,8 @@
                     </a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'blog:user_post_list' %}"> My posts
                     </a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'blog:my_clips' %}"> My clips
+                    </a></li>
                     <li class="nav-item">
                         <form action="{% url 'logout' %}" method="post">{% csrf_token %}
                             <a href="#" class="nav-link" onclick="parentNode.submit();">Log Out</a>

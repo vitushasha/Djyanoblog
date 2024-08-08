@@ -1,15 +1,19 @@
-from .models import Post
+from .models import Post, TextVideoClips
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # from django.views.generic import ListView
-from .forms import EmailPostForm, CommentForm, SearchForm, AddPostForm, Files_for_post
+from .forms import EmailPostForm, CommentForm, SearchForm, AddPostForm, Files_for_post, TextClipsForm
 from django.core.mail import send_mail
 from django.conf import settings
 from django.views.decorators.http import require_POST
 from taggit.models import Tag
 from django.db.models import Count
 from django.contrib.postgres.search import TrigramSimilarity
+import numpy as np
+from moviepy.editor import *
+from moviepy.config import change_settings
 
+change_settings({"IMAGEMAGICK_BINARY": "C:/Program Files/ImageMagick-7.1.1-Q16/magick.exe"})
 
 """
 class PostListView(ListView):
@@ -179,3 +183,53 @@ def post_search(request):
                   {'form': form,
                    'query': query,
                    'results': results})
+
+
+def text_clips(request):
+    form = TextClipsForm()
+    previously_clips = TextVideoClips.objects.all()
+    if request.method == 'POST':
+        clip_form = TextClipsForm(request.POST)
+        if clip_form.is_valid():
+            clip = clip_form.save(commit=False)
+            clip.author = request.user
+            clip.path_to_file = f"/media/generated_video/{clip.name_of_file}.mp4"
+            clip.save()
+            output_path = f'C:/Users/Mainuser/Desktop/Second_project/New_project/mysite/media/generated_video/{clip.name_of_file}.mp4'
+            generate_video_with_text(clip.text, output_path)
+
+            return redirect('blog:my_clips')
+
+    return render(request, 'blog/post/my_clips.html', {'form': form, 'previously_clips': previously_clips})
+
+
+def scroll_left(screenpos, i, nletters, total_duration):
+    speed = 100
+    total_width = 720
+    letter_width = 80  # приблизительная ширина каждой буквы
+
+    # Начальная позиция текста за пределами экрана
+    start_position = np.array([total_width + i * letter_width, 150])
+    return lambda t: start_position - np.array([speed * t, 0])
+
+def moveLetters(letters, funcpos):
+    return [letter.set_pos(funcpos(letter.screenpos, i, len(letters)))
+            for i, letter in enumerate(letters)]
+
+def generate_video_with_text(text, output_path):
+    screensize = (720, 460)
+    letter_clips = [TextClip(char, color='white', font="Arial-Bold", fontsize=150) for char in text]
+
+    for i, letter in enumerate(letter_clips):
+        letter.screenpos = np.array([i * 100, 0])
+
+    total_width = len(text) * 100
+    speed = 100
+    total_duration = total_width / speed
+
+    animated_clip = CompositeVideoClip(
+        moveLetters(letter_clips, lambda screenpos, i, nletters: scroll_left(screenpos, i, nletters, total_duration)),
+        size=screensize
+    ).subclip(0, total_duration)
+
+    animated_clip.write_videofile(output_path, fps=25, codec='libx264')

@@ -1,0 +1,27 @@
+{% extends "blog/base.html" %}
+{% load blog_tags %}
+
+{% block title %}My clips{% endblock %}
+
+{% block content %}
+    <h1>My clips</h1>
+        <form action="{% url 'blog:my_clips'%}" method="post">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <p><input type="submit" value="Get clip"></p>
+        </form>
+    <div class="p-5 border">
+        {% if previously_clips %}
+            <h3>Your previously requests:</h3>
+            {% for clip in previously_clips %}
+                <p>{{ clip.text }}</p>
+                <video controls>
+                        <source src="{{ clip.path_to_file }}" type="video/mp4">
+                        Your browser does not support the video element.
+                </video>
+            {% endfor %}
+        {% else %}
+            There are no texts
+        {% endif %}
+    </div>
+{% endblock %}

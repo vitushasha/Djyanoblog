@@ -42,6 +42,7 @@
                         <p>No audio file associated</p>
                 {% endif %}
                 {% if file.video %}
+                    <p>{{ file.video.url }}</p>
                     <video controls>
                         <source src="{{ file.video.url }}" type="video/mp4">
                         Your browser does not support the video element.

@@ -85,6 +85,14 @@ class PostFiles(models.Model):
         return 'files'
 
 
+class TextVideoClips(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='clips', default=1)
+    name_of_file = models.CharField(max_length=100, verbose_name='Введите желаемое название файла, только латиница, без пробелов')
+    text = models.CharField(max_length=100, verbose_name='Введите текст')
+    path_to_file = models.CharField()
+
+
+
 class Comment(models.Model):
     post = models.ForeignKey(Post,
                              on_delete=models.CASCADE,

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Comment, Post, PostFiles
+from .models import Comment, Post, PostFiles, TextVideoClips
 
 class AddPostForm(forms.ModelForm):
     title = forms.CharField(max_length=100, required=True, widget=forms.TextInput(attrs={"class": "form-control mb-1", 'placeholder': "What's about this post?"}))
@@ -14,6 +14,12 @@ class Files_for_post(forms.ModelForm):
     class Meta:
         model = PostFiles
         fields = ['image', 'audio', 'video']
+
+
+class TextClipsForm(forms.ModelForm):
+    class Meta:
+        model = TextVideoClips
+        fields = ['text', 'name_of_file']
 
 
 class EmailPostForm(forms.Form):

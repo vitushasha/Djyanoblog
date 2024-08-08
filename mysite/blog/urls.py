@@ -11,6 +11,8 @@ urlpatterns = [
 
     path('my_posts/add_posts', views.add_post, name='add_post'),
 
+    path('my_clips/', views.text_clips, name='my_clips'),
+
     # path('', views.PostListView.as_view(), name='post_list'),
 
     path('<int:id>/<slug:post>/',
